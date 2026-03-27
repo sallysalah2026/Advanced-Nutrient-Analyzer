@@ -246,6 +246,18 @@
         .quantity-input[type=number] {
             -moz-appearance: textfield;
         }
+        .export-btn {
+    background: #2c5f2d;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.export-btn:hover {
+    background: #1e4a1f;
+}
     </style>
 </head>
 <body>
@@ -315,6 +327,7 @@
         </div>
         
         <div class="results-grid" id="resultsArea"></div>
+        <button class="export-btn" id="exportBtn" style="margin-left: 10px;">📊 تصدير إلى Excel</button>
         <button class="reset-btn" id="resetBtn">🗑️ إعادة تعيين جميع البيانات</button>
     </div>
 
@@ -889,7 +902,90 @@
         upd(); 
         search.oninput=upd; 
     }
+    function exportToExcel() {
+    if (selectedItems.length === 0) {
+        alert("لا توجد أطعمة لتصديرها!");
+        return;
+    }
     
+    let data = [];
+    
+    let headers = [
+        "الرقم", "الصنف", "الكمية (جم)", "طاقة (سعر)", "بروتين (جم)", 
+        "دهون (جم)", "كربوهيدرات (جم)", "ألياف (جم)", "صوديوم (مجم)", 
+        "بوتاسيوم (مجم)", "كالسيوم (مجم)", "فسفور (مجم)", "ماغنسيوم (مجم)", 
+        "حديد (مجم)", "زنك (مجم)", "نحاس (مجم)", "فيتامين أ", 
+        "فيتامين ج", "فيتامين ب1", "فيتامين ب2"
+    ];
+    data.push(headers);
+    
+    selectedItems.forEach((item, index) => {
+        let n = item.nutrients;
+        let row = [
+            index + 1,
+            item.name,
+            n.quantity,
+            n.calories,
+            n.protein,
+            n.fat,
+            n.carbs,
+            n.fiber,
+            n.sodium,
+            n.potassium,
+            n.calcium,
+            n.phosphorus,
+            n.magnesium,
+            n.iron,
+            n.zinc,
+            n.copper,
+            n.vita,
+            n.vitc,
+            n.vitb1,
+            n.vitb2
+        ];
+        data.push(row);
+    });
+    
+    let totals = { calories: 0, protein: 0, fat: 0, carbs: 0, fiber: 0, sodium: 0, potassium: 0, calcium: 0, phosphorus: 0, magnesium: 0, iron: 0, zinc: 0, copper: 0, vita: 0, vitc: 0, vitb1: 0, vitb2: 0 };
+    
+    selectedItems.forEach(i => {
+        let n = i.nutrients;
+        for (let key in totals) {
+            totals[key] += n[key];
+        }
+    });
+    
+    let totalQty = selectedItems.reduce((sum, i) => sum + i.nutrients.quantity, 0);
+    
+    let totalRow = [
+        "المجموع الكلي", "", totalQty,
+        Math.round(totals.calories),
+        totals.protein.toFixed(1),
+        totals.fat.toFixed(1),
+        totals.carbs.toFixed(1),
+        totals.fiber.toFixed(1),
+        Math.round(totals.sodium),
+        Math.round(totals.potassium),
+        Math.round(totals.calcium),
+        Math.round(totals.phosphorus),
+        Math.round(totals.magnesium),
+        totals.iron.toFixed(1),
+        totals.zinc.toFixed(1),
+        totals.copper.toFixed(2),
+        Math.round(totals.vita),
+        totals.vitc.toFixed(1),
+        totals.vitb1.toFixed(2),
+        totals.vitb2.toFixed(2)
+    ];
+    data.push(totalRow);
+    
+    let wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.aoa_to_sheet(data);
+    XLSX.utils.book_append_sheet(wb, ws, "تحليل العناصر الغذائية");
+    
+    let fileName = `تحليل_الوجبة_${new Date().toLocaleDateString('ar-EG')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+}
     function attachEvents() { 
         ['height','weight','age','gender','patientType'].forEach(id=>{ 
             let el=document.getElementById(id); 
@@ -897,6 +993,7 @@
         }); 
         document.getElementById('addBtn').onclick=addFood; 
         document.getElementById('resetBtn').onclick=resetAll; 
+        document.getElementById('exportBtn').onclick = exportToExcel;
         bindDual('paSelect','paInput'); 
         bindDual('sfSelect','sfInput'); 
         bindDual('pgSelect','pgInput'); 
@@ -908,5 +1005,6 @@
     updateCalculations(); 
     renderTable();
 </script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 </body>
 </html>

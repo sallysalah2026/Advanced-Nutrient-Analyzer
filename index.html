@@ -258,6 +258,16 @@
 .export-btn:hover {
     background: #1e4a1f;
 }
+        .steps-box {
+    background: #f5f5f5;
+    border-right: 4px solid #2c5f2d;
+    padding: 12px;
+    border-radius: 12px;
+    font-family: monospace;
+    font-size: 12px;
+    direction: ltr;
+    text-align: left;
+}
     </style>
 </head>
 <body>
@@ -660,39 +670,112 @@
         return gender === 'male' ? (10*weight)+(6.25*h)-(5*age)+5 : (10*weight)+(6.25*h)-(5*age)-161;
     }
 
-    function updateCalculations() {
-        let h = parseFloat(document.getElementById('height').value);
-        let w = parseFloat(document.getElementById('weight').value);
-        let age = parseFloat(document.getElementById('age').value);
-        let gender = document.getElementById('gender').value;
-        if(isNaN(h)||isNaN(w)||isNaN(age)) return;
-        let bmi = calcBMI(w,h);
-        let ibw = calcIBW(gender,h);
-        let diff = w - ibw;
-        let bmiCat = getBMICat(bmi);
-        let weightUsed = w;
-        let abw = null;
-        if(bmi >= 30) { abw = getAdjWeight(ibw, w); weightUsed = abw; }
-        let bmr = calcBMR(weightUsed, h, age, gender);
-        let tef = bmr * 0.1;
-        let pa = bmr * parseFloat(document.getElementById('paInput').value);
-        let sf = bmr * parseFloat(document.getElementById('sfInput').value);
-        let pg = parseFloat(document.getElementById('pgInput').value);
-        let tee = bmr + tef + pa + sf + pg;
-        document.getElementById('resultsArea').innerHTML = `
-            <div class="result-item"><div class="label">BMI</div><div class="value">${bmi.toFixed(1)}</div><div>${bmiCat}</div></div>
-            <div class="result-item"><div class="label">الوزن المثالي</div><div class="value">${ibw.toFixed(1)} كجم</div></div>
-            <div class="result-item"><div class="label">الفرق في الوزن</div><div class="value">${diff>0?'+':''}${diff.toFixed(1)} كجم</div><div>${diff>0?'زيادة':'نقص'}</div></div>
-            ${abw?`<div class="result-item"><div class="label">الوزن المعدل</div><div class="value">${abw.toFixed(1)} كجم</div></div>`:''}
-            <div class="result-item"><div class="label">BMR</div><div class="value">${Math.round(bmr)}</div></div>
-            <div class="result-item"><div class="label">TEF (10%)</div><div class="value">${Math.round(tef)}</div></div>
-            <div class="result-item"><div class="label">PA (نشاط)</div><div class="value">${Math.round(pa)}</div></div>
-            <div class="result-item"><div class="label">SF (إجهاد)</div><div class="value">${Math.round(sf)}</div></div>
-            <div class="result-item"><div class="label">PG (نمو)</div><div class="value">${pg>0?'+':''}${pg}</div></div>
-            <div class="result-item"><div class="label">TEE (الإجمالي)</div><div class="value">${Math.round(tee)} سعرة</div></div>
-        `;
-        saveToLocal();
+   function updateCalculations() {
+    let h = parseFloat(document.getElementById('height').value);
+    let w = parseFloat(document.getElementById('weight').value);
+    let age = parseFloat(document.getElementById('age').value);
+    let gender = document.getElementById('gender').value;
+    let patientType = document.getElementById('patientType').value;
+    
+    if(isNaN(h)||isNaN(w)||isNaN(age)) return;
+    
+    // 1. حساب BMI
+    let bmi = calcBMI(w,h);
+    let ibw = calcIBW(gender,h);
+    let diff = w - ibw;
+    let bmiCat = getBMICat(bmi);
+    
+    // 2. الوزن المستخدم (معدل لو السمنة)
+    let weightUsed = w;
+    let abw = null;
+    let weightNote = "";
+    if(bmi >= 30) { 
+        abw = getAdjWeight(ibw, w); 
+        weightUsed = abw;
+        weightNote = ` (بما أن BMI = ${bmi.toFixed(1)} > 30، نستخدم الوزن المعدل)`;
     }
+    
+    // 3. تحديد القانون حسب الجنس
+    let bmrFormula = "";
+    let bmr;
+    let bmrSteps;
+    if(gender === 'male') {
+        bmrFormula = "BMR = (10 × الوزن) + (6.25 × الطول) - (5 × العمر) + 5";
+        bmr = (10*weightUsed) + (6.25*h) - (5*age) + 5;
+        bmrSteps = `BMR = (10 × ${weightUsed}) + (6.25 × ${h}) - (5 × ${age}) + 5 = ${bmr.toFixed(1)}`;
+    } else {
+        bmrFormula = "BMR = (10 × الوزن) + (6.25 × الطول) - (5 × العمر) - 161";
+        bmr = (10*weightUsed) + (6.25*h) - (5*age) - 161;
+        bmrSteps = `BMR = (10 × ${weightUsed}) + (6.25 × ${h}) - (5 × ${age}) - 161 = ${bmr.toFixed(1)}`;
+    }
+    
+    // 4. قوانين العوامل
+    let tefFormula = "TEF = BMR × 0.1 (تأثير الطعام الحراري)";
+    let tef = bmr * 0.1;
+    let tefSteps = `TEF = ${bmr.toFixed(1)} × 0.1 = ${tef.toFixed(1)}`;
+    
+    let paValue = parseFloat(document.getElementById('paInput').value);
+    let paFormula = `PA = BMR × عامل النشاط (${paValue})`;
+    let pa = bmr * paValue;
+    let paSteps = `PA = ${bmr.toFixed(1)} × ${paValue} = ${pa.toFixed(1)}`;
+    
+    let sfValue = parseFloat(document.getElementById('sfInput').value);
+    let sfFormula = `SF = BMR × عامل الإجهاد (${sfValue})`;
+    let sf = bmr * sfValue;
+    let sfSteps = `SF = ${bmr.toFixed(1)} × ${sfValue} = ${sf.toFixed(1)}`;
+    
+    let pg = parseFloat(document.getElementById('pgInput').value);
+    let pgFormula = "PG = عامل النمو (يضاف أو يطرح حسب الحالة)";
+    let pgSteps = `PG = ${pg > 0 ? '+' : ''}${pg}`;
+    
+    // 5. القانون النهائي لـ TEE
+    let teeFormula = "TEE = BMR + TEF + PA + SF + PG";
+    let tee = bmr + tef + pa + sf + pg;
+    
+    // 6. عرض النتائج مع القوانين والخطوات
+    document.getElementById('resultsArea').innerHTML = `
+        <div class="result-item" style="grid-column: span 2; background: #f0f7f0; text-align: right;">
+            <div class="label" style="font-size: 14px; color: #2c5f2d;">📐 معادلة Mifflin-St Jeor</div>
+            <div style="font-size: 12px; text-align: right; direction: ltr; font-family: monospace; line-height: 1.8;">
+                <strong style="color: #1e4a1f;">【 القانون الأساسي 】</strong><br>
+                ${bmrFormula}<br>
+                <strong style="color: #1e4a1f;">【 التعويض بالأرقام 】</strong><br>
+                ${bmrSteps}<br><br>
+                
+                <strong style="color: #1e4a1f;">【 تأثير الطعام TEF 】</strong><br>
+                ${tefFormula}<br>
+                ${tefSteps}<br><br>
+                
+                <strong style="color: #1e4a1f;">【 النشاط البدني PA 】</strong><br>
+                ${paFormula}<br>
+                ${paSteps}<br><br>
+                
+                <strong style="color: #1e4a1f;">【 عامل الإجهاد SF 】</strong><br>
+                ${sfFormula}<br>
+                ${sfSteps}<br><br>
+                
+                <strong style="color: #1e4a1f;">【 عامل النمو PG 】</strong><br>
+                ${pgFormula}<br>
+                ${pgSteps}<br><br>
+                
+                <strong style="color: #1e4a1f;">【 المعادلة النهائية TEE 】</strong><br>
+                ${teeFormula}<br>
+                <strong>${bmr.toFixed(1)} + ${tef.toFixed(1)} + ${pa.toFixed(1)} + ${sf.toFixed(1)} + ${pg} = ${Math.round(tee)} سعرة</strong>
+            </div>
+        </div>
+        <div class="result-item"><div class="label">BMI</div><div class="value">${bmi.toFixed(1)}</div><div>${bmiCat}</div></div>
+        <div class="result-item"><div class="label">الوزن المثالي</div><div class="value">${ibw.toFixed(1)} كجم</div></div>
+        <div class="result-item"><div class="label">الفرق في الوزن</div><div class="value">${diff>0?'+':''}${diff.toFixed(1)} كجم</div><div>${diff>0?'زيادة':'نقص'}</div></div>
+        ${abw?`<div class="result-item"><div class="label">الوزن المعدل</div><div class="value">${abw.toFixed(1)} كجم</div><div class="small-note">${weightNote}</div></div>`:''}
+        <div class="result-item"><div class="label">BMR (الاستقلاب الأساسي)</div><div class="value">${Math.round(bmr)}</div></div>
+        <div class="result-item"><div class="label">TEF (تأثير الطعام)</div><div class="value">${Math.round(tef)}</div></div>
+        <div class="result-item"><div class="label">PA (النشاط البدني)</div><div class="value">${Math.round(pa)}</div></div>
+        <div class="result-item"><div class="label">SF (عامل الإجهاد)</div><div class="value">${Math.round(sf)}</div></div>
+        <div class="result-item"><div class="label">PG (عامل النمو)</div><div class="value">${pg>0?'+':''}${pg}</div></div>
+        <div class="result-item"><div class="label">💡 TEE (الإجمالي اليومي)</div><div class="value">${Math.round(tee)} سعرة</div></div>
+    `;
+    saveToLocal();
+}
 
     function bindDual(selectId, inputId) {
         let sel = document.getElementById(selectId), inp = document.getElementById(inputId);

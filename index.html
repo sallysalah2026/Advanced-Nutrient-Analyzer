@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>محلل العناصر الغذائية المتقدم</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -177,14 +177,74 @@
             font-size: 11px;
         }
         .food-name { font-weight: bold; text-align: right; background: #f9f9f9; }
-        .quantity-input { width: 65px; padding: 5px; border: 1px solid #ddd; border-radius: 6px; text-align: center; }
-        .delete-btn { background: #e74c3c; color: white; border: none; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 11px; }
+        .quantity-input { 
+            width: 65px; 
+            padding: 5px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            text-align: center;
+            font-size: 12px;
+        }
+        .delete-btn { 
+            background: #e74c3c; 
+            color: white; 
+            border: none; 
+            padding: 3px 8px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 11px;
+        }
         .total-row { background: #e8f5e9; font-weight: bold; }
         footer { text-align: center; padding: 25px; color: rgba(255,255,255,0.6); font-size: 13px; }
+        
+        /* أزرار الكمية الجديدة */
+        .quantity-cell {
+            min-width: 140px;
+        }
+        .qty-minus-btn, .qty-plus-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.1s;
+        }
+        .qty-minus-btn:active, .qty-plus-btn:active {
+            transform: scale(0.95);
+        }
+        .qty-minus-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        .qty-plus-btn {
+            background: #2c5f2d;
+            color: white;
+        }
+        
         @media (max-width: 768px) {
             th, td { font-size: 9px; padding: 5px 2px; }
-            .quantity-input { width: 55px; }
+            .quantity-input { width: 50px; font-size: 11px; }
+            .quantity-cell { min-width: 120px; }
+            .qty-minus-btn, .qty-plus-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+            }
             .three-row .input-group { min-width: 100%; }
+        }
+        
+        /* إخفاء أسهم حقل الرقم الافتراضية */
+        .quantity-input::-webkit-inner-spin-button,
+        .quantity-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .quantity-input[type=number] {
+            -moz-appearance: textfield;
         }
     </style>
 </head>
@@ -198,7 +258,6 @@
     <div class="card">
         <div class="card-title">📊 حاسبة السعرات الحرارية (Mifflin‑St Jeor)</div>
         
-        <!-- الصف الأول: المدخلات الأساسية -->
         <div class="form-grid">
             <div class="input-group"><label>الطول (سم)</label><input type="number" id="height" placeholder="مثال: 170"></div>
             <div class="input-group"><label>الوزن (كجم)</label><input type="number" id="weight" placeholder="مثال: 75"></div>
@@ -207,7 +266,6 @@
             <div class="input-group"><label>حالة المريض</label><select id="patientType"><option value="inpatient">Inpatient (داخلي)</option><option value="outpatient">Outpatient (خارجي)</option></select></div>
         </div>
         
-        <!-- الصف الثلاثي: PA, SF, PG -->
         <div class="three-row">
             <div class="input-group">
                 <label>مستوى النشاط (Activity Factor – PA)</label>
@@ -256,7 +314,6 @@
             </div>
         </div>
         
-        <!-- منطقة النتائج -->
         <div class="results-grid" id="resultsArea"></div>
         <button class="reset-btn" id="resetBtn">🗑️ إعادة تعيين جميع البيانات</button>
     </div>
@@ -285,7 +342,9 @@
     <div class="table-container">
         <table>
             <thead>
-                <tr><th>#</th><th>الصنف</th><th>كمية (جم)</th><th>طاقة</th><th>بروتين</th><th>دهون</th><th>كربوهيدرات</th><th>ألياف</th><th>صوديوم</th><th>بوتاسيوم</th><th>كالسيوم</th><th>فسفور</th><th>ماغنسيوم</th><th>حديد</th><th>زنك</th><th>نحاس</th><th>فيت أ</th><th>فيت ج</th><th>فيت ب1</th><th>فيت ب2</th><th></th></tr>
+                <tr>
+                    <th>#</th><th>الصنف</th><th>كمية (جم)</th><th>طاقة</th><th>بروتين</th><th>دهون</th><th>كربوهيدرات</th><th>ألياف</th><th>صوديوم</th><th>بوتاسيوم</th><th>كالسيوم</th><th>فسفور</th><th>ماغنسيوم</th><th>حديد</th><th>زنك</th><th>نحاس</th><th>فيت أ</th><th>فيت ج</th><th>فيت ب1</th><th>فيت ب2</th><th></th>
+                </tr>
             </thead>
             <tbody id="tableBody"><tr><td colspan="21">📋 أضف الأطعمة من القائمة</td></tr></tbody>
             <tfoot id="tableFoot"></tfoot>
@@ -295,8 +354,8 @@
 </div>
 
 <script>
-    // قاعدة بيانات بسيطة (يمكنك استبدالها بالكاملة لاحقًا)
-const foodDatabase = {
+    // قاعدة البيانات (نفس البيانات الموجودة في الكود الأصلي)
+   const foodDatabase = {
     // ==================== Table 1 - حبوب ونشويات (1-26) ====================
     "ذرة حبوب (بيضاء)": { calories: 364, protein: 10.2, fat: 4, carbs: 71.9, fiber: 1.9, sodium: 8, potassium: 125, calcium: 27, phosphorus: 254, magnesium: 25, iron: 2.42, zinc: 1.7, copper: 0.21, vita: 0, vitc: 0, vitb1: 0.37, vitb2: 0.12 },
     "ذرة حبوب (صفراء)": { calories: 368, protein: 12.7, fat: 5.5, carbs: 67, fiber: 2.9, sodium: 10, potassium: 161, calcium: 26, phosphorus: 239, magnesium: 30, iron: 2.6, zinc: 1.5, copper: 0.19, vita: 120, vitc: 0, vitb1: 0.39, vitb2: 0.11 },
@@ -566,6 +625,7 @@ const foodDatabase = {
     "فلفل أحمر (شطة)": { calories: 291, protein: 15.6, fat: 7.7, carbs: 39.8, fiber: 18.1, sodium: 215, potassium: 1150, calcium: 140, phosphorus: 230, magnesium: 145, iron: 8.7, zinc: 3.4, copper: 0.5, vita: 0, vitc: 0, vitb1: 0.2, vitb2: 0.81 }
 };
 
+
         // قائمة الأطعمة المتاحة (كل الأصناف)
         const foodList = Object.keys(foodDatabase).sort((a, b) => a.localeCompare(b, 'ar'));
 
@@ -626,6 +686,7 @@ const foodDatabase = {
         sel.onchange = () => { inp.value = sel.value; updateCalculations(); saveToLocal(); };
         inp.oninput = () => { let v = parseFloat(inp.value); if(!isNaN(v)) { let match = Array.from(sel.options).find(opt=>Math.abs(parseFloat(opt.value)-v)<0.001); sel.value = match ? match.value : ""; updateCalculations(); saveToLocal(); } };
     }
+    
     function saveToLocal() {
         localStorage.setItem('calorieData', JSON.stringify({
             height: document.getElementById('height').value, weight: document.getElementById('weight').value, age: document.getElementById('age').value,
@@ -634,6 +695,7 @@ const foodDatabase = {
             selectedItems: selectedItems
         }));
     }
+    
     function loadFromLocal() {
         let d = localStorage.getItem('calorieData');
         if(d) {
@@ -652,18 +714,199 @@ const foodDatabase = {
             syncSelect('paSelect','paInput'); syncSelect('sfSelect','sfInput'); syncSelect('pgSelect','pgInput');
         }
     }
+    
     function syncSelect(selId, inpId) { let sel=document.getElementById(selId), inp=document.getElementById(inpId); let v=parseFloat(inp.value); let match=Array.from(sel.options).find(opt=>Math.abs(parseFloat(opt.value)-v)<0.001); if(match) sel.value=match.value; else sel.value=""; }
-    function resetAll() { if(confirm("إعادة تعيين؟")) { localStorage.removeItem('calorieData'); location.reload(); } }
+    function resetAll() { if(confirm("إعادة تعيين جميع البيانات؟")) { localStorage.removeItem('calorieData'); location.reload(); } }
 
-    function calcNutrients(food, qty) { let d = foodDatabase[food]; if(!d) return null; let r = qty/100; return { quantity:qty, calories:Math.round(d.calories*r), protein:+(d.protein*r).toFixed(2), fat:+(d.fat*r).toFixed(2), carbs:+(d.carbs*r).toFixed(2), fiber:+(d.fiber*r).toFixed(2), sodium:Math.round(d.sodium*r), potassium:Math.round(d.potassium*r), calcium:Math.round(d.calcium*r), phosphorus:Math.round(d.phosphorus*r), magnesium:Math.round(d.magnesium*r), iron:+(d.iron*r).toFixed(2), zinc:+(d.zinc*r).toFixed(2), copper:+(d.copper*r).toFixed(2), vita:Math.round(d.vita*r), vitc:+(d.vitc*r).toFixed(1), vitb1:+(d.vitb1*r).toFixed(2), vitb2:+(d.vitb2*r).toFixed(2) }; }
-    function updateSummary() { let t={calories:0,protein:0,fat:0,carbs:0,fiber:0,sodium:0,potassium:0,iron:0}; selectedItems.forEach(i=>{ let n=i.nutrients; t.calories+=n.calories; t.protein+=n.protein; t.fat+=n.fat; t.carbs+=n.carbs; t.fiber+=n.fiber; t.sodium+=n.sodium; t.potassium+=n.potassium; t.iron+=n.iron; }); document.getElementById('totalCalories').innerText=Math.round(t.calories); document.getElementById('totalProtein').innerText=t.protein.toFixed(1); document.getElementById('totalFat').innerText=t.fat.toFixed(1); document.getElementById('totalCarbs').innerText=t.carbs.toFixed(1); document.getElementById('totalFiber').innerText=t.fiber.toFixed(1); document.getElementById('totalSodium').innerText=Math.round(t.sodium); document.getElementById('totalPotassium').innerText=Math.round(t.potassium); document.getElementById('totalIron').innerText=t.iron.toFixed(1); }
-    function renderTable() { let tbody=document.getElementById('tableBody'); if(selectedItems.length===0){ tbody.innerHTML='<tr><td colspan="21">📋 لا توجد أطعمة مضافة</td></tr>'; document.getElementById('tableFoot').innerHTML=''; updateSummary(); return; } tbody.innerHTML=selectedItems.map((item,idx)=>{ let n=item.nutrients; return `<tr><td>${idx+1}</td><td class="food-name">${item.name}</td><td><input type="number" class="quantity-input" value="${n.quantity}" step="10" onchange="updateQ(${item.id},this.value)"></td><td>${n.calories}</td><td>${n.protein}</td><td>${n.fat}</td><td>${n.carbs}</td><td>${n.fiber}</td><td>${n.sodium}</td><td>${n.potassium}</td><td>${n.calcium}</td><td>${n.phosphorus}</td><td>${n.magnesium}</td><td>${n.iron}</td><td>${n.zinc}</td><td>${n.copper}</td><td>${n.vita}</td><td>${n.vitc}</td><td>${n.vitb1}</td><td>${n.vitb2}</td><td><button class="delete-btn" onclick="deleteItem(${item.id})">✖</button></td></tr>`; }).join(''); let totals={calories:0,protein:0,fat:0,carbs:0,fiber:0,sodium:0,potassium:0,calcium:0,phosphorus:0,magnesium:0,iron:0,zinc:0,copper:0,vita:0,vitc:0,vitb1:0,vitb2:0}; selectedItems.forEach(i=>{ let n=i.nutrients; for(let k in totals) totals[k]+=n[k]; }); let totalQty=selectedItems.reduce((s,i)=>s+i.nutrients.quantity,0); document.getElementById('tableFoot').innerHTML=`<tr class="total-row"><td colspan="2"><strong>المجموع</strong></td><td><strong>${totalQty} جم</strong></td><td>${Math.round(totals.calories)}</td><td>${totals.protein.toFixed(1)}</td><td>${totals.fat.toFixed(1)}</td><td>${totals.carbs.toFixed(1)}</td><td>${totals.fiber.toFixed(1)}</td><td>${Math.round(totals.sodium)}</td><td>${Math.round(totals.potassium)}</td><td>${Math.round(totals.calcium)}</td><td>${Math.round(totals.phosphorus)}</td><td>${Math.round(totals.magnesium)}</td><td>${totals.iron.toFixed(1)}</td><td>${totals.zinc.toFixed(1)}</td><td>${totals.copper.toFixed(2)}</td><td>${Math.round(totals.vita)}</td><td>${totals.vitc.toFixed(1)}</td><td>${totals.vitb1.toFixed(2)}</td><td>${totals.vitb2.toFixed(2)}</td><td></td></tr>`; updateSummary(); saveToLocal(); }
-    window.updateQ = function(id, qty) { let item = selectedItems.find(i=>i.id===id); if(item && qty>=0) { item.nutrients = calcNutrients(item.name, parseFloat(qty)); renderTable(); } };
-    window.deleteItem = function(id) { selectedItems = selectedItems.filter(i=>i.id!==id); renderTable(); };
-    function addFood() { let name = document.getElementById('foodSelect').value, qty = parseFloat(document.getElementById('foodQuantity').value); if(!name) { alert("اختر صنفاً"); return; } if(qty<=0) { alert("أدخل كمية صحيحة"); return; } selectedItems.push({ id:Date.now(), name:name, nutrients:calcNutrients(name,qty) }); renderTable(); document.getElementById('foodQuantity').value=100; }
-    function populateFoodSelect() { let sel=document.getElementById('foodSelect'), search=document.getElementById('searchSelect'); function upd() { let term=search.value.toLowerCase(); let filtered=foodList.filter(f=>f.includes(term)); sel.innerHTML='<option value="">-- اختر --</option>'; filtered.forEach(f=>{ let opt=document.createElement('option'); opt.value=f; opt.textContent=f; sel.appendChild(opt); }); } upd(); search.oninput=upd; }
-    function attachEvents() { ['height','weight','age','gender','patientType'].forEach(id=>{ let el=document.getElementById(id); if(el) el.oninput=()=>{ updateCalculations(); saveToLocal(); }; }); document.getElementById('addBtn').onclick=addFood; document.getElementById('resetBtn').onclick=resetAll; bindDual('paSelect','paInput'); bindDual('sfSelect','sfInput'); bindDual('pgSelect','pgInput'); }
-    populateFoodSelect(); loadFromLocal(); attachEvents(); updateCalculations(); renderTable();
+    function calcNutrients(food, qty) { 
+        let d = foodDatabase[food]; 
+        if(!d) return null; 
+        let r = qty/100; 
+        return { 
+            quantity:qty,
+            calories:Math.round(d.calories*r), 
+            protein:+(d.protein*r).toFixed(2), 
+            fat:+(d.fat*r).toFixed(2), 
+            carbs:+(d.carbs*r).toFixed(2), 
+            fiber:+(d.fiber*r).toFixed(2), 
+            sodium:Math.round(d.sodium*r), 
+            potassium:Math.round(d.potassium*r), 
+            calcium:Math.round(d.calcium*r), 
+            phosphorus:Math.round(d.phosphorus*r), 
+            magnesium:Math.round(d.magnesium*r), 
+            iron:+(d.iron*r).toFixed(2), 
+            zinc:+(d.zinc*r).toFixed(2), 
+            copper:+(d.copper*r).toFixed(2), 
+            vita:Math.round(d.vita*r), 
+            vitc:+(d.vitc*r).toFixed(1), 
+            vitb1:+(d.vitb1*r).toFixed(2), 
+            vitb2:+(d.vitb2*r).toFixed(2) 
+        }; 
+    }
+    
+    function updateSummary() { 
+        let t={calories:0,protein:0,fat:0,carbs:0,fiber:0,sodium:0,potassium:0,iron:0}; 
+        selectedItems.forEach(i=>{ let n=i.nutrients; t.calories+=n.calories; t.protein+=n.protein; t.fat+=n.fat; t.carbs+=n.carbs; t.fiber+=n.fiber; t.sodium+=n.sodium; t.potassium+=n.potassium; t.iron+=n.iron; }); 
+        document.getElementById('totalCalories').innerText=Math.round(t.calories); 
+        document.getElementById('totalProtein').innerText=t.protein.toFixed(1); 
+        document.getElementById('totalFat').innerText=t.fat.toFixed(1); 
+        document.getElementById('totalCarbs').innerText=t.carbs.toFixed(1); 
+        document.getElementById('totalFiber').innerText=t.fiber.toFixed(1); 
+        document.getElementById('totalSodium').innerText=Math.round(t.sodium); 
+        document.getElementById('totalPotassium').innerText=Math.round(t.potassium); 
+        document.getElementById('totalIron').innerText=t.iron.toFixed(1); 
+    }
+    
+    function renderTable() { 
+        let tbody=document.getElementById('tableBody'); 
+        if(selectedItems.length===0){ 
+            tbody.innerHTML='<tr><td colspan="21">📋 لا توجد أطعمة مضافة</td></tr>'; 
+            document.getElementById('tableFoot').innerHTML=''; 
+            updateSummary(); 
+            return; 
+        } 
+        
+        tbody.innerHTML=selectedItems.map((item,idx)=>{ 
+            let n=item.nutrients; 
+            return `<tr>
+                <td>${idx+1}</td>
+                <td class="food-name">${item.name}</td>
+                <td class="quantity-cell">
+                    <div style="display: flex; align-items: center; gap: 5px; justify-content: center; flex-wrap: nowrap;">
+                        <button class="qty-minus-btn" data-id="${item.id}" style="width: 32px; height: 32px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; touch-action: manipulation;">-</button>
+                        <input type="number" class="quantity-input" value="${n.quantity}" step="10" style="width: 65px; text-align: center;" onchange="updateQ(${item.id},this.value)">
+                        <button class="qty-plus-btn" data-id="${item.id}" style="width: 32px; height: 32px; background: #2c5f2d; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; touch-action: manipulation;">+</button>
+                    </div>
+                </td>
+                <td>${n.calories}</td>
+                <td>${n.protein}</td>
+                <td>${n.fat}</td>
+                <td>${n.carbs}</td>
+                <td>${n.fiber}</td>
+                <td>${n.sodium}</td>
+                <td>${n.potassium}</td>
+                <td>${n.calcium}</td>
+                <td>${n.phosphorus}</td>
+                <td>${n.magnesium}</td>
+                <td>${n.iron}</td>
+                <td>${n.zinc}</td>
+                <td>${n.copper}</td>
+                <td>${n.vita}</td>
+                <td>${n.vitc}</td>
+                <td>${n.vitb1}</td>
+                <td>${n.vitb2}</td>
+                <td><button class="delete-btn" onclick="deleteItem(${item.id})">✖</button></td>
+            </tr>`; 
+        }).join(''); 
+        
+        // إضافة مستمعي الأحداث لأزرار + و -
+        document.querySelectorAll('.qty-minus-btn').forEach(btn => {
+            btn.removeEventListener('click', handleMinusClick);
+            btn.addEventListener('click', handleMinusClick);
+        });
+        
+        document.querySelectorAll('.qty-plus-btn').forEach(btn => {
+            btn.removeEventListener('click', handlePlusClick);
+            btn.addEventListener('click', handlePlusClick);
+        });
+        
+        let totals={calories:0,protein:0,fat:0,carbs:0,fiber:0,sodium:0,potassium:0,calcium:0,phosphorus:0,magnesium:0,iron:0,zinc:0,copper:0,vita:0,vitc:0,vitb1:0,vitb2:0}; 
+        selectedItems.forEach(i=>{ let n=i.nutrients; for(let k in totals) totals[k]+=n[k]; }); 
+        let totalQty=selectedItems.reduce((s,i)=>s+i.nutrients.quantity,0); 
+        document.getElementById('tableFoot').innerHTML=`<tr class="total-row"><td colspan="2"><strong>المجموع</strong></td><td><strong>${totalQty} جم</strong></td><td>${Math.round(totals.calories)}</td><td>${totals.protein.toFixed(1)}</td><td>${totals.fat.toFixed(1)}</td><td>${totals.carbs.toFixed(1)}</td><td>${totals.fiber.toFixed(1)}</td><td>${Math.round(totals.sodium)}</td><td>${Math.round(totals.potassium)}</td><td>${Math.round(totals.calcium)}</td><td>${Math.round(totals.phosphorus)}</td><td>${Math.round(totals.magnesium)}</td><td>${totals.iron.toFixed(1)}</td><td>${totals.zinc.toFixed(1)}</td><td>${totals.copper.toFixed(2)}</td><td>${Math.round(totals.vita)}</td><td>${totals.vitc.toFixed(1)}</td><td>${totals.vitb1.toFixed(2)}</td><td>${totals.vitb2.toFixed(2)}</td><td></td></tr>`; 
+        updateSummary(); 
+        saveToLocal(); 
+    }
+    
+    function handleMinusClick(e) {
+        let id = parseInt(e.currentTarget.getAttribute('data-id'));
+        let item = selectedItems.find(i => i.id === id);
+        if(item && item.nutrients.quantity > 0) {
+            let newQty = item.nutrients.quantity - 10;
+            if(newQty < 0) newQty = 0;
+            item.nutrients = calcNutrients(item.name, newQty);
+            renderTable();
+        }
+    }
+    
+    function handlePlusClick(e) {
+        let id = parseInt(e.currentTarget.getAttribute('data-id'));
+        let item = selectedItems.find(i => i.id === id);
+        if(item) {
+            let newQty = item.nutrients.quantity + 10;
+            item.nutrients = calcNutrients(item.name, newQty);
+            renderTable();
+        }
+    }
+    
+    window.updateQ = function(id, qty) { 
+        let item = selectedItems.find(i=>i.id===id); 
+        if(item && qty>=0) { 
+            item.nutrients = calcNutrients(item.name, parseFloat(qty)); 
+            renderTable(); 
+        } 
+    };
+    
+    window.deleteItem = function(id) { 
+        selectedItems = selectedItems.filter(i=>i.id!==id); 
+        renderTable(); 
+    };
+    
+    function addFood() { 
+        let name = document.getElementById('foodSelect').value; 
+        let qty = parseFloat(document.getElementById('foodQuantity').value); 
+        if(!name) { 
+            alert("اختر صنفاً"); 
+            return; 
+        } 
+        if(qty<=0) { 
+            alert("أدخل كمية صحيحة"); 
+            return; 
+        } 
+        selectedItems.push({ 
+            id:Date.now(), 
+            name:name, 
+            nutrients:calcNutrients(name,qty) 
+        }); 
+        renderTable(); 
+        document.getElementById('foodQuantity').value=100; 
+    }
+    
+    function populateFoodSelect() { 
+        let sel=document.getElementById('foodSelect'); 
+        let search=document.getElementById('searchSelect'); 
+        function upd() { 
+            let term=search.value.toLowerCase(); 
+            let filtered=foodList.filter(f=>f.includes(term)); 
+            sel.innerHTML='<option value="">-- اختر --</option>'; 
+            filtered.forEach(f=>{ 
+                let opt=document.createElement('option'); 
+                opt.value=f; 
+                opt.textContent=f; 
+                sel.appendChild(opt); 
+            }); 
+        } 
+        upd(); 
+        search.oninput=upd; 
+    }
+    
+    function attachEvents() { 
+        ['height','weight','age','gender','patientType'].forEach(id=>{ 
+            let el=document.getElementById(id); 
+            if(el) el.oninput=()=>{ updateCalculations(); saveToLocal(); }; 
+        }); 
+        document.getElementById('addBtn').onclick=addFood; 
+        document.getElementById('resetBtn').onclick=resetAll; 
+        bindDual('paSelect','paInput'); 
+        bindDual('sfSelect','sfInput'); 
+        bindDual('pgSelect','pgInput'); 
+    }
+    
+    populateFoodSelect(); 
+    loadFromLocal(); 
+    attachEvents(); 
+    updateCalculations(); 
+    renderTable();
 </script>
 </body>
 </html>

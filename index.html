@@ -69,7 +69,7 @@
         .three-row .input-group { flex: 1; min-width: 220px; }
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
             background: #f9f9f9;
             padding: 15px;
@@ -192,9 +192,7 @@
             font-weight: bold;
             cursor: pointer;
             touch-action: manipulation;
-            transition: transform 0.1s;
         }
-        .qty-btn:active { transform: scale(0.95); }
         .qty-minus { background: #e74c3c; color: white; }
         .qty-plus { background: #2c5f2d; color: white; }
         .delete-btn { background: #e74c3c; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; }
@@ -206,7 +204,6 @@
             .qty-btn { width: 26px; height: 26px; font-size: 14px; }
             .three-row .input-group { min-width: 100%; }
         }
-        /* إخفاء أسهم حقل الرقم */
         .quantity-input::-webkit-inner-spin-button, .quantity-input::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
@@ -222,7 +219,6 @@
         <p>احسب احتياجاتك اليومية وحلل وجباتك بذكاء</p>
     </div>
 
-    <!-- Card: المدخلات والحسابات -->
     <div class="card">
         <div class="card-title">📊 حاسبة السعرات الحرارية</div>
         <div class="form-grid">
@@ -284,7 +280,6 @@
         <button class="reset-btn" id="resetBtn">🗑️ إعادة تعيين جميع البيانات</button>
     </div>
 
-    <!-- قسم إضافة الأطعمة -->
     <div class="add-section">
         <div class="card-title">➕ إضافة صنف غذائي</div>
         <div class="add-form">
@@ -295,7 +290,6 @@
         <div class="search-box"><input type="text" id="searchSelect" placeholder="🔍 ابحث عن صنف..."></div>
     </div>
 
-    <!-- بطاقات الملخص السريع -->
     <div class="summary" id="summaryCards">
         <div class="summary-card"><h4>إجمالي السعرات</h4><div class="value" id="totalCalories">0</div></div>
         <div class="summary-card"><h4>بروتين</h4><div class="value" id="totalProtein">0</div></div>
@@ -307,22 +301,20 @@
         <div class="summary-card"><h4>حديد</h4><div class="value" id="totalIron">0</div></div>
     </div>
 
-    <!-- الجدول التفاعلي -->
     <div class="table-container">
-        <table id="mainTable">
+        <table>
             <thead>
-                <tr><th>#</th><th>الصنف</th><th>الكمية (جم)</th><th>طاقة</th><th>بروتين</th><th>دهون</th><th>كربوهيدرات</th><th>ألياف</th><th>صوديوم</th><th>بوتاسيوم</th><th>كالسيوم</th><th>فسفور</th><th>ماغنسيوم</th><th>حديد</th><th>زنك</th><th>نحاس</th><th>فيت أ</th><th>فيت ج</th><th>فيت ب1</th><th>فيت ب2</th><th></th></tr>
+                <tr><th>#</th><th>الصنف</th><th>الكمية (جم)</th><th>طاقة</th><th>بروتين</th><th>دهون</th><th>كربوهيدرات</th><th>ألياف</th><th>صوديوم</th><th>بوتاسيوم</th><th>كالسيوم</th><th>فسفور</th><th>ماغنسيوم</th><th>حديد</th><th>زنك</th><th>نحاس</th><th>فيت أ</th><th>فيت ج</th><th>فيت ب1</th><th>فيت ب2</th><th></th> </tr>
             </thead>
-            <tbody id="tableBody"><tr><td colspan="21">📋 أضف الأطعمة من القائمة</td></tr></tbody>
+            <tbody id="tableBody">发展<td colspan="21">📋 أضف الأطعمة من القائمة</td> </tr></tbody>
             <tfoot id="tableFoot"></tfoot>
-        </table>
+         </table>
     </div>
     <footer>جميع القيم لكل 100 جرام | يتم الحفظ تلقائيًا في متصفحك</footer>
 </div>
 
 <script>
-// ==================== قاعدة البيانات الغذائية الكاملة ====================
-// (تم إدراج أهم 100 صنف للاختصار، يمكنك إضافة الباقي بنفس النمط)
+// قاعدة بيانات غذائية (نموذج)
 const foodDatabase = {
 // ==================== Table 1 - حبوب ونشويات (1-26) ====================
 "ذرة حبوب (بيضاء)": { calories: 364, protein: 10.2, fat: 4, carbs: 71.9, fiber: 1.9, sodium: 8, potassium: 125, calcium: 27, phosphorus: 254, magnesium: 25, iron: 2.42, zinc: 1.7, copper: 0.21, vita: 0, vitc: 0, vitb1: 0.37, vitb2: 0.12 },
@@ -600,7 +592,6 @@ const foodList = Object.keys(foodDatabase).sort((a, b) => a.localeCompare(b, 'ar
 let selectedItems = [];
 let searchTerm = "";
 
-// ==================== دوال حسابية ====================
 function calcIBW(gender, h) { return gender === 'male' ? (h-100)-((h-150)/4) : (h-100)-((h-150)/2); }
 function calcBMI(w,h) { return w / ((h/100)**2); }
 function getBMICat(bmi) {
@@ -612,15 +603,11 @@ function getBMICat(bmi) {
     return "سمنة مفرطة";
 }
 function getAdjWeight(ibw, actual) { return ibw + 0.4 * (actual - ibw); }
-
-// دالة BMR الرئيسية - تفرق بين Inpatient و Outpatient
 function calcBMR(weight, height, age, gender, patientType) {
     if (patientType === 'inpatient') {
-        // Harris-Benedict
         if (gender === 'male') return 88.4 + (13.4 * weight) + (4.8 * height) - (5.7 * age);
         else return 447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age);
     } else {
-        // Mifflin-St Jeor (outpatient)
         if (gender === 'male') return (10 * weight) + (6.25 * height) - (5 * age) + 5;
         else return (10 * weight) + (6.25 * height) - (5 * age) - 161;
     }
@@ -634,110 +621,63 @@ function updateCalculations() {
     let patientType = document.getElementById('patientType').value;
     if(isNaN(h)||isNaN(w)||isNaN(age)) return;
     
-    // 1. حساب BMI والوزن المثالي
     let bmi = calcBMI(w,h);
     let ibw = calcIBW(gender,h);
     let diff = w - ibw;
     let bmiCat = getBMICat(bmi);
-    
-    // 2. الوزن المستخدم (معدل لو السمنة)
     let weightUsed = w;
     let abw = null;
     let weightNote = "";
-    if(bmi >= 30) { 
-        abw = getAdjWeight(ibw, w); 
-        weightUsed = abw;
-        weightNote = ` (بما أن BMI = ${bmi.toFixed(1)} > 30، نستخدم الوزن المعدل)`;
-    }
+    if(bmi >= 30) { abw = getAdjWeight(ibw, w); weightUsed = abw; weightNote = ` (بما أن BMI = ${bmi.toFixed(1)} > 30، نستخدم الوزن المعدل)`; }
     
-    // 3. حساب BMR حسب حالة المريض مع الخطوات
-    let bmrFormula = "";
-    let bmr;
-    let bmrSteps;
-    let formulaName = "";
-    
+    let bmrFormula = "", bmr, bmrSteps, formulaName = "";
     if (patientType === 'inpatient') {
         formulaName = "Harris-Benedict (داخلي)";
         if (gender === 'male') {
             bmrFormula = "BMR = 88.4 + (13.4 × الوزن) + (4.8 × الطول) - (5.7 × العمر)";
             bmr = 88.4 + (13.4 * weightUsed) + (4.8 * h) - (5.7 * age);
-            bmrSteps = BMR = 88.4 + (13.4 × ${weightUsed.toFixed(1)}) + (4.8 × ${h}) - (5.7 × ${age}) = ${bmr.toFixed(1)};
+            bmrSteps = `BMR = 88.4 + (13.4 × ${weightUsed.toFixed(1)}) + (4.8 × ${h}) - (5.7 × ${age}) = ${bmr.toFixed(1)}`;
         } else {
             bmrFormula = "BMR = 447.6 + (9.2 × الوزن) + (3.1 × الطول) - (4.3 × العمر)";
             bmr = 447.6 + (9.2 * weightUsed) + (3.1 * h) - (4.3 * age);
-            bmrSteps = BMR = 447.6 + (9.2 × ${weightUsed.toFixed(1)}) + (3.1 × ${h}) - (4.3 × ${age}) = ${bmr.toFixed(1)};
+            bmrSteps = `BMR = 447.6 + (9.2 × ${weightUsed.toFixed(1)}) + (3.1 × ${h}) - (4.3 × ${age}) = ${bmr.toFixed(1)}`;
         }
     } else {
         formulaName = "Mifflin-St Jeor (خارجي)";
         if (gender === 'male') {
             bmrFormula = "BMR = (10 × الوزن) + (6.25 × الطول) - (5 × العمر) + 5";
             bmr = (10 * weightUsed) + (6.25 * h) - (5 * age) + 5;
-            bmrSteps = BMR = (10 × ${weightUsed.toFixed(1)}) + (6.25 × ${h}) - (5 × ${age}) + 5 = ${bmr.toFixed(1)};
+            bmrSteps = `BMR = (10 × ${weightUsed.toFixed(1)}) + (6.25 × ${h}) - (5 × ${age}) + 5 = ${bmr.toFixed(1)}`;
         } else {
             bmrFormula = "BMR = (10 × الوزن) + (6.25 × الطول) - (5 × العمر) - 161";
             bmr = (10 * weightUsed) + (6.25 * h) - (5 * age) - 161;
-            bmrSteps = BMR = (10 × ${weightUsed.toFixed(1)}) + (6.25 × ${h}) - (5 × ${age}) - 161 = ${bmr.toFixed(1)};
+            bmrSteps = `BMR = (10 × ${weightUsed.toFixed(1)}) + (6.25 × ${h}) - (5 × ${age}) - 161 = ${bmr.toFixed(1)}`;
         }
     }
     
-    // 4. حساب العوامل الأخرى مع الخطوات
-    let tefFormula = "TEF = BMR × 0.1 (تأثير الطعام الحراري)";
     let tef = bmr * 0.1;
-    let tefSteps = TEF = ${bmr.toFixed(1)} × 0.1 = ${tef.toFixed(1)};
-    
-    let paValue = parseFloat(document.getElementById('paInput').value);
-    let paFormula = PA = BMR × عامل النشاط (${paValue});
-    let pa = bmr * paValue;
-    let paSteps = PA = ${bmr.toFixed(1)} × ${paValue} = ${pa.toFixed(1)};
-    
-    let sfValue = parseFloat(document.getElementById('sfInput').value);
-    let sfFormula = SF = BMR × عامل الإجهاد (${sfValue});
-    let sf = bmr * sfValue;
-    let sfSteps = SF = ${bmr.toFixed(1)} × ${sfValue} = ${sf.toFixed(1)};
-    
+    let pa = bmr * parseFloat(document.getElementById('paInput').value);
+    let sf = bmr * parseFloat(document.getElementById('sfInput').value);
     let pg = parseFloat(document.getElementById('pgInput').value);
-    let pgFormula = "PG = عامل النمو (يضاف أو يطرح حسب الحالة)";
-    let pgSteps = PG = ${pg > 0 ? '+' : ''}${pg};
-    
-    // 5. TEE النهائي
-    let teeFormula = "TEE = BMR + TEF + PA + SF + PG";
     let tee = bmr + tef + pa + sf + pg;
     
-    // 6. عرض النتائج مع المربع الجانبي (القوانين والخطوات)
     document.getElementById('resultsArea').innerHTML = `
         <div class="result-item" style="grid-column: span 2; background: #f0f7f0; text-align: right;">
             <div class="label" style="font-size: 14px; color: #2c5f2d;">📐 معادلة ${formulaName}</div>
             <div style="font-size: 12px; text-align: right; direction: ltr; font-family: monospace; line-height: 1.8;">
-                <strong style="color: #1e4a1f;">【 القانون الأساسي 】</strong><br>
-                ${bmrFormula}<br>
-                <strong style="color: #1e4a1f;">【 التعويض بالأرقام 】</strong><br>
-                ${bmrSteps}<br><br>
-                
-                <strong style="color: #1e4a1f;">【 تأثير الطعام TEF 】</strong><br>
-                ${tefFormula}<br>
-                ${tefSteps}<br><br>
-                
-                <strong style="color: #1e4a1f;">【 النشاط البدني PA 】</strong><br>
-                ${paFormula}<br>
-                ${paSteps}<br><br>
-                
-                <strong style="color: #1e4a1f;">【 عامل الإجهاد SF 】</strong><br>
-                ${sfFormula}<br>
-                ${sfSteps}<br><br>
-                
-                <strong style="color: #1e4a1f;">【 عامل النمو PG 】</strong><br>
-                ${pgFormula}<br>
-                ${pgSteps}<br><br>
-                
-                <strong style="color: #1e4a1f;">【 المعادلة النهائية TEE 】</strong><br>
-                ${teeFormula}<br>
-                <strong>${bmr.toFixed(1)} + ${tef.toFixed(1)} + ${pa.toFixed(1)} + ${sf.toFixed(1)} + ${pg} = ${Math.round(tee)} سعرة</strong>
+                <strong style="color: #1e4a1f;">【 القانون الأساسي 】</strong><br>${bmrFormula}<br>
+                <strong style="color: #1e4a1f;">【 التعويض بالأرقام 】</strong><br>${bmrSteps}<br><br>
+                <strong style="color: #1e4a1f;">【 تأثير الطعام TEF 】</strong><br>TEF = BMR × 0.1<br>TEF = ${bmr.toFixed(1)} × 0.1 = ${tef.toFixed(1)}<br><br>
+                <strong style="color: #1e4a1f;">【 النشاط البدني PA 】</strong><br>PA = BMR × عامل النشاط (${parseFloat(document.getElementById('paInput').value)})<br>PA = ${bmr.toFixed(1)} × ${parseFloat(document.getElementById('paInput').value)} = ${pa.toFixed(1)}<br><br>
+                <strong style="color: #1e4a1f;">【 عامل الإجهاد SF 】</strong><br>SF = BMR × عامل الإجهاد (${parseFloat(document.getElementById('sfInput').value)})<br>SF = ${bmr.toFixed(1)} × ${parseFloat(document.getElementById('sfInput').value)} = ${sf.toFixed(1)}<br><br>
+                <strong style="color: #1e4a1f;">【 عامل النمو PG 】</strong><br>PG = ${pg > 0 ? '+' : ''}${pg}<br><br>
+                <strong style="color: #1e4a1f;">【 المعادلة النهائية TEE 】</strong><br>TEE = BMR + TEF + PA + SF + PG<br><strong>${bmr.toFixed(1)} + ${tef.toFixed(1)} + ${pa.toFixed(1)} + ${sf.toFixed(1)} + ${pg} = ${Math.round(tee)} سعرة</strong>
             </div>
         </div>
         <div class="result-item"><div class="label">BMI</div><div class="value">${bmi.toFixed(1)}</div><div>${bmiCat}</div></div>
         <div class="result-item"><div class="label">الوزن المثالي</div><div class="value">${ibw.toFixed(1)} كجم</div></div>
         <div class="result-item"><div class="label">الفرق في الوزن</div><div class="value">${diff>0?'+':''}${diff.toFixed(1)} كجم</div><div>${diff>0?'زيادة':'نقص'}</div></div>
-        ${abw?<div class="result-item"><div class="label">الوزن المعدل</div><div class="value">${abw.toFixed(1)} كجم</div><div class="small-note">${weightNote}</div></div>:''}
+        ${abw?`<div class="result-item"><div class="label">الوزن المعدل</div><div class="value">${abw.toFixed(1)} كجم</div><div class="small-note">${weightNote}</div></div>`:''}
         <div class="result-item"><div class="label">BMR (الاستقلاب الأساسي)</div><div class="value">${Math.round(bmr)}</div></div>
         <div class="result-item"><div class="label">TEF (تأثير الطعام)</div><div class="value">${Math.round(tef)}</div></div>
         <div class="result-item"><div class="label">PA (النشاط البدني)</div><div class="value">${Math.round(pa)}</div></div>
@@ -748,270 +688,71 @@ function updateCalculations() {
     saveToLocal();
 }
 
-// ==================== دوال الجدول والكميات ====================
 function calcNutrients(food, qty) {
     let d = foodDatabase[food];
     if(!d) return null;
     let r = qty/100;
-    return {
-        quantity: qty,
-        calories: d.calories * r,
-        protein: d.protein * r,
-        fat: d.fat * r,
-        carbs: d.carbs * r,
-        fiber: d.fiber * r,
-        sodium: d.sodium * r,
-        potassium: d.potassium * r,
-        calcium: d.calcium * r,
-        phosphorus: d.phosphorus * r,
-        magnesium: d.magnesium * r,
-        iron: d.iron * r,
-        zinc: d.zinc * r,
-        copper: d.copper * r,
-        vita: d.vita * r,
-        vitc: d.vitc * r,
-        vitb1: d.vitb1 * r,
-        vitb2: d.vitb2 * r
-    };
+    return { quantity:qty, calories: d.calories * r, protein: d.protein * r, fat: d.fat * r, carbs: d.carbs * r, fiber: d.fiber * r, sodium: d.sodium * r, potassium: d.potassium * r, calcium: d.calcium * r, phosphorus: d.phosphorus * r, magnesium: d.magnesium * r, iron: d.iron * r, zinc: d.zinc * r, copper: d.copper * r, vita: d.vita * r, vitc: d.vitc * r, vitb1: d.vitb1 * r, vitb2: d.vitb2 * r };
 }
 
 function updateSummary() {
-    let t = {calories:0,protein:0,fat:0,carbs:0,fiber:0,sodium:0,potassium:0,iron:0};
+    let t={calories:0,protein:0,fat:0,carbs:0,fiber:0,sodium:0,potassium:0,iron:0};
     selectedItems.forEach(i=>{ let n=i.nutrients; t.calories+=n.calories; t.protein+=n.protein; t.fat+=n.fat; t.carbs+=n.carbs; t.fiber+=n.fiber; t.sodium+=n.sodium; t.potassium+=n.potassium; t.iron+=n.iron; });
-    document.getElementById('totalCalories').innerText = Math.round(t.calories);
-    document.getElementById('totalProtein').innerText = t.protein.toFixed(1);
-    document.getElementById('totalFat').innerText = t.fat.toFixed(1);
-    document.getElementById('totalCarbs').innerText = t.carbs.toFixed(1);
-    document.getElementById('totalFiber').innerText = t.fiber.toFixed(1);
-    document.getElementById('totalSodium').innerText = Math.round(t.sodium);
-    document.getElementById('totalPotassium').innerText = Math.round(t.potassium);
-    document.getElementById('totalIron').innerText = t.iron.toFixed(1);
+    document.getElementById('totalCalories').innerText=Math.round(t.calories);
+    document.getElementById('totalProtein').innerText=t.protein.toFixed(1);
+    document.getElementById('totalFat').innerText=t.fat.toFixed(1);
+    document.getElementById('totalCarbs').innerText=t.carbs.toFixed(1);
+    document.getElementById('totalFiber').innerText=t.fiber.toFixed(1);
+    document.getElementById('totalSodium').innerText=Math.round(t.sodium);
+    document.getElementById('totalPotassium').innerText=Math.round(t.potassium);
+    document.getElementById('totalIron').innerText=t.iron.toFixed(1);
 }
 
 function renderTable() {
-    let tbody = document.getElementById('tableBody');
-    if(selectedItems.length === 0){
-        tbody.innerHTML = '<tr><td colspan="21">📋 لا توجد أطعمة مضافة</td></tr>';
-        document.getElementById('tableFoot').innerHTML = '';
-        updateSummary();
-        return;
-    }
-    tbody.innerHTML = selectedItems.map((item, idx) => {
-        let n = item.nutrients;
-        return `<tr>
-            <td>${idx+1}</td>
-            <td class="food-name">${item.name}</td>
-            <td>
-                <div class="quantity-cell">
-                    <button class="qty-btn qty-minus" data-id="${item.id}">-</button>
-                    <input type="number" class="quantity-input" value="${n.quantity}" step="10" data-id="${item.id}" id="qty-${item.id}">
-                    <button class="qty-btn qty-plus" data-id="${item.id}">+</button>
-                </div>
-            </td>
-            <td>${n.calories.toFixed(1)}</td>
-            <td>${n.protein.toFixed(2)}</td>
-            <td>${n.fat.toFixed(2)}</td>
-            <td>${n.carbs.toFixed(2)}</td>
-            <td>${n.fiber.toFixed(2)}</td>
-            <td>${Math.round(n.sodium)}</td>
-            <td>${Math.round(n.potassium)}</td>
-            <td>${Math.round(n.calcium)}</td>
-            <td>${Math.round(n.phosphorus)}</td>
-            <td>${Math.round(n.magnesium)}</td>
-            <td>${n.iron.toFixed(2)}</td>
-            <td>${n.zinc.toFixed(2)}</td>
-            <td>${n.copper.toFixed(3)}</td>
-            <td>${Math.round(n.vita)}</td>
-            <td>${n.vitc.toFixed(1)}</td>
-            <td>${n.vitb1.toFixed(3)}</td>
-            <td>${n.vitb2.toFixed(3)}</td>
-            <td><button class="delete-btn" onclick="deleteItem(${item.id})">✖</button></td>
-        </tr>`;
-    }).join('');
-    
-    let totals = {calories:0,protein:0,fat:0,carbs:0,fiber:0,sodium:0,potassium:0,calcium:0,phosphorus:0,magnesium:0,iron:0,zinc:0,copper:0,vita:0,vitc:0,vitb1:0,vitb2:0};
+    let tbody=document.getElementById('tableBody');
+    if(selectedItems.length===0){ tbody.innerHTML='<tr><td colspan="21">📋 لا توجد أطعمة مضافة</td></tr>'; document.getElementById('tableFoot').innerHTML=''; updateSummary(); return; }
+    tbody.innerHTML=selectedItems.map((item,idx)=>{ let n=item.nutrients; return `<tr>
+        <td>${idx+1}</td><td class="food-name">${item.name}</td>
+        <td><div class="quantity-cell"><button class="qty-btn qty-minus" data-id="${item.id}">-</button><input type="number" class="quantity-input" value="${n.quantity}" step="10" data-id="${item.id}"><button class="qty-btn qty-plus" data-id="${item.id}">+</button></div></td>
+        <td>${n.calories.toFixed(1)}</td><td>${n.protein.toFixed(2)}</td><td>${n.fat.toFixed(2)}</td><td>${n.carbs.toFixed(2)}</td><td>${n.fiber.toFixed(2)}</td>
+        <td>${Math.round(n.sodium)}</td><td>${Math.round(n.potassium)}</td><td>${Math.round(n.calcium)}</td><td>${Math.round(n.phosphorus)}</td><td>${Math.round(n.magnesium)}</td>
+        <td>${n.iron.toFixed(2)}</td><td>${n.zinc.toFixed(2)}</td><td>${n.copper.toFixed(3)}</td><td>${Math.round(n.vita)}</td><td>${n.vitc.toFixed(1)}</td><td>${n.vitb1.toFixed(3)}</td><td>${n.vitb2.toFixed(3)}</td>
+        <td><button class="delete-btn" onclick="deleteItem(${item.id})">✖</button></td>
+    </tr>`; }).join('');
+    let totals={calories:0,protein:0,fat:0,carbs:0,fiber:0,sodium:0,potassium:0,calcium:0,phosphorus:0,magnesium:0,iron:0,zinc:0,copper:0,vita:0,vitc:0,vitb1:0,vitb2:0};
     selectedItems.forEach(i=>{ let n=i.nutrients; for(let k in totals) totals[k]+=n[k]; });
-    let totalQty = selectedItems.reduce((s,i)=>s+i.nutrients.quantity,0);
-    document.getElementById('tableFoot').innerHTML = `<tr class="total-row"><td colspan="2"><strong>المجموع</strong></td><td><strong>${totalQty} جم</strong></td>
+    let totalQty=selectedItems.reduce((s,i)=>s+i.nutrients.quantity,0);
+    document.getElementById('tableFoot').innerHTML=`<tr class="total-row"><td colspan="2"><strong>المجموع</strong></td><td><strong>${totalQty} جم</strong></td>
         <td>${Math.round(totals.calories)}</td><td>${totals.protein.toFixed(1)}</td><td>${totals.fat.toFixed(1)}</td><td>${totals.carbs.toFixed(1)}</td><td>${totals.fiber.toFixed(1)}</td>
         <td>${Math.round(totals.sodium)}</td><td>${Math.round(totals.potassium)}</td><td>${Math.round(totals.calcium)}</td><td>${Math.round(totals.phosphorus)}</td><td>${Math.round(totals.magnesium)}</td>
-        <td>${totals.iron.toFixed(1)}</td><td>${totals.zinc.toFixed(1)}</td><td>${totals.copper.toFixed(2)}</td><td>${Math.round(totals.vita)}</td><td>${totals.vitc.toFixed(1)}</td><td>${totals.vitb1.toFixed(2)}</td><td>${totals.vitb2.toFixed(2)}</td><td></td></tr>`;
+        <td>${totals.iron.toFixed(1)}</td><td>${totals.zinc.toFixed(1)}</td><td>${totals.copper.toFixed(2)}非
+        <td>${Math.round(totals.vita)} non
+        <td>${totals.vitc.toFixed(1)} non
+        <td>${totals.vitb1.toFixed(2)} non
+        <td>${totals.vitb2.toFixed(2)} non
+        <td></td></tr>`;
     updateSummary();
     saveToLocal();
     attachQuantityEvents();
 }
 
 function attachQuantityEvents() {
-    document.querySelectorAll('.qty-minus').forEach(btn => {
-        btn.removeEventListener('click', handleMinus);
-        btn.addEventListener('click', handleMinus);
-    });
-    document.querySelectorAll('.qty-plus').forEach(btn => {
-        btn.removeEventListener('click', handlePlus);
-        btn.addEventListener('click', handlePlus);
-    });
-    document.querySelectorAll('.quantity-input').forEach(inp => {
-        inp.removeEventListener('change', handleInputChange);
-        inp.addEventListener('change', handleInputChange);
-    });
+    document.querySelectorAll('.qty-minus').forEach(btn => { btn.onclick = (e) => { let id = parseInt(btn.getAttribute('data-id')); let item = selectedItems.find(i=>i.id===id); if(item && item.nutrients.quantity > 0) { let newQty = Math.max(0, item.nutrients.quantity - 10); item.nutrients = calcNutrients(item.name, newQty); renderTable(); } }; });
+    document.querySelectorAll('.qty-plus').forEach(btn => { btn.onclick = (e) => { let id = parseInt(btn.getAttribute('data-id')); let item = selectedItems.find(i=>i.id===id); if(item) { let newQty = item.nutrients.quantity + 10; item.nutrients = calcNutrients(item.name, newQty); renderTable(); } }; });
+    document.querySelectorAll('.quantity-input').forEach(inp => { inp.onchange = (e) => { let id = parseInt(inp.getAttribute('data-id')); let newQty = parseFloat(inp.value); if(isNaN(newQty)) newQty = 0; let item = selectedItems.find(i=>i.id===id); if(item) { item.nutrients = calcNutrients(item.name, newQty); renderTable(); } }; });
 }
 
-function handleMinus(e) {
-    let id = parseInt(e.currentTarget.getAttribute('data-id'));
-    let item = selectedItems.find(i => i.id === id);
-    if(item && item.nutrients.quantity > 0) {
-        let newQty = Math.max(0, item.nutrients.quantity - 10);
-        item.nutrients = calcNutrients(item.name, newQty);
-        renderTable();
-    }
-}
-
-function handlePlus(e) {
-    let id = parseInt(e.currentTarget.getAttribute('data-id'));
-    let item = selectedItems.find(i => i.id === id);
-    if(item) {
-        let newQty = item.nutrients.quantity + 10;
-        item.nutrients = calcNutrients(item.name, newQty);
-        renderTable();
-    }
-}
-
-function handleInputChange(e) {
-    let id = parseInt(e.target.getAttribute('data-id'));
-    let newQty = parseFloat(e.target.value);
-    if(isNaN(newQty)) newQty = 0;
-    let item = selectedItems.find(i => i.id === id);
-    if(item) {
-        item.nutrients = calcNutrients(item.name, newQty);
-        renderTable();
-    }
-}
-
-window.deleteItem = function(id) {
-    selectedItems = selectedItems.filter(i => i.id !== id);
-    renderTable();
-};
-
-function addFood() {
-    let name = document.getElementById('foodSelect').value;
-    let qty = parseFloat(document.getElementById('foodQuantity').value);
-    if(!name) { alert("اختر صنفاً"); return; }
-    if(qty <= 0) { alert("أدخل كمية صحيحة"); return; }
-    selectedItems.push({ id: Date.now(), name: name, nutrients: calcNutrients(name, qty) });
-    renderTable();
-    document.getElementById('foodQuantity').value = 100;
-}
-
-function populateFoodSelect() {
-    let sel = document.getElementById('foodSelect');
-    let search = document.getElementById('searchSelect');
-    function upd() {
-        let term = search.value.toLowerCase();
-        let filtered = foodList.filter(f => f.includes(term));
-        sel.innerHTML = '<option value="">-- اختر --</option>';
-        filtered.forEach(f => { let opt = document.createElement('option'); opt.value = f; opt.textContent = f; sel.appendChild(opt); });
-    }
-    upd();
-    search.oninput = upd;
-}
-
-// ==================== حفظ واسترجاع localStorage ====================
-function saveToLocal() {
-    localStorage.setItem('calorieData', JSON.stringify({
-        height: document.getElementById('height').value,
-        weight: document.getElementById('weight').value,
-        age: document.getElementById('age').value,
-        gender: document.getElementById('gender').value,
-        patientType: document.getElementById('patientType').value,
-        paInput: document.getElementById('paInput').value,
-        sfInput: document.getElementById('sfInput').value,
-        pgInput: document.getElementById('pgInput').value,
-        selectedItems: selectedItems
-    }));
-}
-
-function loadFromLocal() {
-    let d = localStorage.getItem('calorieData');
-    if(d) {
-        let data = JSON.parse(d);
-        if(data.height) document.getElementById('height').value = data.height;
-        if(data.weight) document.getElementById('weight').value = data.weight;
-        if(data.age) document.getElementById('age').value = data.age;
-        if(data.gender) document.getElementById('gender').value = data.gender;
-        if(data.patientType) document.getElementById('patientType').value = data.patientType;
-        if(data.paInput) document.getElementById('paInput').value = data.paInput;
-        if(data.sfInput) document.getElementById('sfInput').value = data.sfInput;
-        if(data.pgInput) document.getElementById('pgInput').value = data.pgInput;
-        if(data.selectedItems) selectedItems = data.selectedItems;
-        renderTable();
-        updateCalculations();
-        syncSelect('paSelect','paInput');
-        syncSelect('sfSelect','sfInput');
-        syncSelect('pgSelect','pgInput');
-    }
-}
-
-function syncSelect(selId, inpId) {
-    let sel = document.getElementById(selId);
-    let inp = document.getElementById(inpId);
-    let v = parseFloat(inp.value);
-    let match = Array.from(sel.options).find(opt => Math.abs(parseFloat(opt.value) - v) < 0.001);
-    if(match) sel.value = match.value;
-    else sel.value = "";
-}
-
-function bindDual(selectId, inputId) {
-    let sel = document.getElementById(selectId);
-    let inp = document.getElementById(inputId);
-    sel.onchange = () => { inp.value = sel.value; updateCalculations(); saveToLocal(); };
-    inp.oninput = () => { let v = parseFloat(inp.value); if(!isNaN(v)) { let match = Array.from(sel.options).find(opt=>Math.abs(parseFloat(opt.value)-v)<0.001); sel.value = match ? match.value : ""; updateCalculations(); saveToLocal(); } };
-}
-
-function resetAll() {
-    if(confirm("إعادة تعيين جميع البيانات؟")) {
-        localStorage.removeItem('calorieData');
-        location.reload();
-    }
-}
-
-function exportToExcel() {
-    if(selectedItems.length === 0) { alert("لا توجد أطعمة لتصديرها!"); return; }
-    let data = [];
-    let headers = ["#", "الصنف", "الكمية (جم)", "طاقة (سعر)", "بروتين (جم)", "دهون (جم)", "كربوهيدرات (جم)", "ألياف (جم)", "صوديوم (مجم)", "بوتاسيوم (مجم)", "كالسيوم (مجم)", "فسفور (مجم)", "ماغنسيوم (مجم)", "حديد (مجم)", "زنك (مجم)", "نحاس (مجم)", "فيتامين أ", "فيتامين ج", "فيتامين ب1", "فيتامين ب2"];
-    data.push(headers);
-    selectedItems.forEach((item, idx) => {
-        let n = item.nutrients;
-        data.push([idx+1, item.name, n.quantity, n.calories.toFixed(1), n.protein.toFixed(2), n.fat.toFixed(2), n.carbs.toFixed(2), n.fiber.toFixed(2), Math.round(n.sodium), Math.round(n.potassium), Math.round(n.calcium), Math.round(n.phosphorus), Math.round(n.magnesium), n.iron.toFixed(2), n.zinc.toFixed(2), n.copper.toFixed(3), Math.round(n.vita), n.vitc.toFixed(1), n.vitb1.toFixed(3), n.vitb2.toFixed(3)]);
-    });
-    let totals = {calories:0,protein:0,fat:0,carbs:0,fiber:0,sodium:0,potassium:0,calcium:0,phosphorus:0,magnesium:0,iron:0,zinc:0,copper:0,vita:0,vitc:0,vitb1:0,vitb2:0};
-    selectedItems.forEach(i=>{ let n=i.nutrients; for(let k in totals) totals[k]+=n[k]; });
-    let totalQty = selectedItems.reduce((s,i)=>s+i.nutrients.quantity,0);
-    data.push(["المجموع الكلي", "", totalQty, totals.calories.toFixed(1), totals.protein.toFixed(1), totals.fat.toFixed(1), totals.carbs.toFixed(1), totals.fiber.toFixed(1), Math.round(totals.sodium), Math.round(totals.potassium), Math.round(totals.calcium), Math.round(totals.phosphorus), Math.round(totals.magnesium), totals.iron.toFixed(1), totals.zinc.toFixed(1), totals.copper.toFixed(2), Math.round(totals.vita), totals.vitc.toFixed(1), totals.vitb1.toFixed(2), totals.vitb2.toFixed(2)]);
-    
-    let wb = XLSX.utils.book_new();
-    let ws = XLSX.utils.aoa_to_sheet(data);
-    XLSX.utils.book_append_sheet(wb, ws, "تحليل_الوجبة");
-    XLSX.writeFile(wb, `تحليل_الوجبة_${new Date().toLocaleDateString('ar-EG')}.xlsx`);
-}
-
-function attachEvents() {
-    ['height','weight','age','gender','patientType'].forEach(id => {
-        let el = document.getElementById(id);
-        if(el) el.oninput = () => { updateCalculations(); saveToLocal(); };
-    });
-    document.getElementById('addBtn').onclick = addFood;
-    document.getElementById('resetBtn').onclick = resetAll;
-    document.getElementById('exportBtn').onclick = exportToExcel;
-    bindDual('paSelect','paInput');
-    bindDual('sfSelect','sfInput');
-    bindDual('pgSelect','pgInput');
-}
-
-populateFoodSelect();
-loadFromLocal();
-attachEvents();
-updateCalculations();
-renderTable();
+window.deleteItem = function(id) { selectedItems = selectedItems.filter(i=>i.id!==id); renderTable(); };
+function addFood() { let name = document.getElementById('foodSelect').value; let qty = parseFloat(document.getElementById('foodQuantity').value); if(!name) { alert("اختر صنفاً"); return; } if(qty <= 0) { alert("أدخل كمية صحيحة"); return; } selectedItems.push({ id: Date.now(), name: name, nutrients: calcNutrients(name, qty) }); renderTable(); document.getElementById('foodQuantity').value = 100; }
+function populateFoodSelect() { let sel = document.getElementById('foodSelect'); let search = document.getElementById('searchSelect'); function upd() { let term = search.value.toLowerCase(); let filtered = foodList.filter(f => f.includes(term)); sel.innerHTML = '<option value="">-- اختر --</option>'; filtered.forEach(f => { let opt = document.createElement('option'); opt.value = f; opt.textContent = f; sel.appendChild(opt); }); } upd(); search.oninput = upd; }
+function saveToLocal() { localStorage.setItem('calorieData', JSON.stringify({ height: document.getElementById('height').value, weight: document.getElementById('weight').value, age: document.getElementById('age').value, gender: document.getElementById('gender').value, patientType: document.getElementById('patientType').value, paInput: document.getElementById('paInput').value, sfInput: document.getElementById('sfInput').value, pgInput: document.getElementById('pgInput').value, selectedItems: selectedItems })); }
+function loadFromLocal() { let d = localStorage.getItem('calorieData'); if(d) { let data = JSON.parse(d); if(data.height) document.getElementById('height').value = data.height; if(data.weight) document.getElementById('weight').value = data.weight; if(data.age) document.getElementById('age').value = data.age; if(data.gender) document.getElementById('gender').value = data.gender; if(data.patientType) document.getElementById('patientType').value = data.patientType; if(data.paInput) document.getElementById('paInput').value = data.paInput; if(data.sfInput) document.getElementById('sfInput').value = data.sfInput; if(data.pgInput) document.getElementById('pgInput').value = data.pgInput; if(data.selectedItems) selectedItems = data.selectedItems; renderTable(); updateCalculations(); syncSelect('paSelect','paInput'); syncSelect('sfSelect','sfInput'); syncSelect('pgSelect','pgInput'); } }
+function syncSelect(selId, inpId) { let sel = document.getElementById(selId); let inp = document.getElementById(inpId); let v = parseFloat(inp.value); let match = Array.from(sel.options).find(opt => Math.abs(parseFloat(opt.value) - v) < 0.001); if(match) sel.value = match.value; else sel.value = ""; }
+function bindDual(selectId, inputId) { let sel = document.getElementById(selectId); let inp = document.getElementById(inputId); sel.onchange = () => { inp.value = sel.value; updateCalculations(); saveToLocal(); }; inp.oninput = () => { let v = parseFloat(inp.value); if(!isNaN(v)) { let match = Array.from(sel.options).find(opt=>Math.abs(parseFloat(opt.value)-v)<0.001); sel.value = match ? match.value : ""; updateCalculations(); saveToLocal(); } }; }
+function resetAll() { if(confirm("إعادة تعيين جميع البيانات؟")) { localStorage.removeItem('calorieData'); location.reload(); } }
+function exportToExcel() { if(selectedItems.length === 0) { alert("لا توجد أطعمة لتصديرها!"); return; } let data = [["#","الصنف","الكمية (جم)","طاقة (سعر)","بروتين (جم)","دهون (جم)","كربوهيدرات (جم)","ألياف (جم)","صوديوم (مجم)","بوتاسيوم (مجم)","كالسيوم (مجم)","فسفور (مجم)","ماغنسيوم (مجم)","حديد (مجم)","زنك (مجم)","نحاس (مجم)","فيتامين أ","فيتامين ج","فيتامين ب1","فيتامين ب2"]]; selectedItems.forEach((item, idx) => { let n = item.nutrients; data.push([idx+1, item.name, n.quantity, n.calories.toFixed(1), n.protein.toFixed(2), n.fat.toFixed(2), n.carbs.toFixed(2), n.fiber.toFixed(2), Math.round(n.sodium), Math.round(n.potassium), Math.round(n.calcium), Math.round(n.phosphorus), Math.round(n.magnesium), n.iron.toFixed(2), n.zinc.toFixed(2), n.copper.toFixed(3), Math.round(n.vita), n.vitc.toFixed(1), n.vitb1.toFixed(3), n.vitb2.toFixed(3)]); }); let totals = {calories:0,protein:0,fat:0,carbs:0,fiber:0,sodium:0,potassium:0,calcium:0,phosphorus:0,magnesium:0,iron:0,zinc:0,copper:0,vita:0,vitc:0,vitb1:0,vitb2:0}; selectedItems.forEach(i=>{ let n=i.nutrients; for(let k in totals) totals[k]+=n[k]; }); let totalQty = selectedItems.reduce((s,i)=>s+i.nutrients.quantity,0); data.push(["المجموع الكلي", "", totalQty, totals.calories.toFixed(1), totals.protein.toFixed(1), totals.fat.toFixed(1), totals.carbs.toFixed(1), totals.fiber.toFixed(1), Math.round(totals.sodium), Math.round(totals.potassium), Math.round(totals.calcium), Math.round(totals.phosphorus), Math.round(totals.magnesium), totals.iron.toFixed(1), totals.zinc.toFixed(1), totals.copper.toFixed(2), Math.round(totals.vita), totals.vitc.toFixed(1), totals.vitb1.toFixed(2), totals.vitb2.toFixed(2)]); let wb = XLSX.utils.book_new(); let ws = XLSX.utils.aoa_to_sheet(data); XLSX.utils.book_append_sheet(wb, ws, "تحليل_الوجبة"); XLSX.writeFile(wb, `تحليل_الوجبة_${new Date().toLocaleDateString('ar-EG')}.xlsx`); }
+function attachEvents() { ['height','weight','age','gender','patientType'].forEach(id => { let el = document.getElementById(id); if(el) el.oninput = () => { updateCalculations(); saveToLocal(); }; }); document.getElementById('addBtn').onclick = addFood; document.getElementById('resetBtn').onclick = resetAll; document.getElementById('exportBtn').onclick = exportToExcel; bindDual('paSelect','paInput'); bindDual('sfSelect','sfInput'); bindDual('pgSelect','pgInput'); }
+populateFoodSelect(); loadFromLocal(); attachEvents(); updateCalculations(); renderTable();
 </script>
 </body>
 </html>

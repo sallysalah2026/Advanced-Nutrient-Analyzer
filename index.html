@@ -666,9 +666,23 @@
         return "سمنة مفرطة";
     }
     function getAdjWeight(ibw, actual) { return ibw + 0.4 * (actual - ibw); }
-    function calcBMR(weight, h, age, gender) {
-        return gender === 'male' ? (10*weight)+(6.25*h)-(5*age)+5 : (10*weight)+(6.25*h)-(5*age)-161;
+   function calculateBMR(weightUsed, heightCm, age, gender, patientType) {
+    if (patientType === 'inpatient') {
+        // Harris-Benedict
+        if (gender === 'male') {
+            return 88.4 + (13.4 * weightUsed) + (4.8 * heightCm) - (5.7 * age);
+        } else {
+            return 447.6 + (9.2 * weightUsed) + (3.1 * heightCm) - (4.3 * age);
+        }
+    } else {
+        // Mifflin-St Jeor (outpatient)
+        if (gender === 'male') {
+            return (10 * weightUsed) + (6.25 * heightCm) - (5 * age) + 5;
+        } else {
+            return (10 * weightUsed) + (6.25 * heightCm) - (5 * age) - 161;
+        }
     }
+}
 
    function updateCalculations() {
     let h = parseFloat(document.getElementById('height').value);
@@ -814,31 +828,31 @@
     function syncSelect(selId, inpId) { let sel=document.getElementById(selId), inp=document.getElementById(inpId); let v=parseFloat(inp.value); let match=Array.from(sel.options).find(opt=>Math.abs(parseFloat(opt.value)-v)<0.001); if(match) sel.value=match.value; else sel.value=""; }
     function resetAll() { if(confirm("إعادة تعيين جميع البيانات؟")) { localStorage.removeItem('calorieData'); location.reload(); } }
 
-    function calcNutrients(food, qty) { 
-        let d = foodDatabase[food]; 
-        if(!d) return null; 
-        let r = qty/100; 
-        return { 
-            quantity:qty,
-            calories:Math.round(d.calories*r), 
-            protein:+(d.protein*r).toFixed(2), 
-            fat:+(d.fat*r).toFixed(2), 
-            carbs:+(d.carbs*r).toFixed(2), 
-            fiber:+(d.fiber*r).toFixed(2), 
-            sodium:Math.round(d.sodium*r), 
-            potassium:Math.round(d.potassium*r), 
-            calcium:Math.round(d.calcium*r), 
-            phosphorus:Math.round(d.phosphorus*r), 
-            magnesium:Math.round(d.magnesium*r), 
-            iron:+(d.iron*r).toFixed(2), 
-            zinc:+(d.zinc*r).toFixed(2), 
-            copper:+(d.copper*r).toFixed(2), 
-            vita:Math.round(d.vita*r), 
-            vitc:+(d.vitc*r).toFixed(1), 
-            vitb1:+(d.vitb1*r).toFixed(2), 
-            vitb2:+(d.vitb2*r).toFixed(2) 
-        }; 
-    }
+function calcNutrients(food, qty) { 
+    let d = foodDatabase[food]; 
+    if(!d) return null; 
+    let r = qty/100; 
+    return { 
+        quantity: qty,
+        calories: d.calories * r, 
+        protein: d.protein * r, 
+        fat: d.fat * r, 
+        carbs: d.carbs * r, 
+        fiber: d.fiber * r, 
+        sodium: d.sodium * r, 
+        potassium: d.potassium * r, 
+        calcium: d.calcium * r, 
+        phosphorus: d.phosphorus * r, 
+        magnesium: d.magnesium * r, 
+        iron: d.iron * r, 
+        zinc: d.zinc * r, 
+        copper: d.copper * r, 
+        vita: d.vita * r, 
+        vitc: d.vitc * r, 
+        vitb1: d.vitb1 * r, 
+        vitb2: d.vitb2 * r 
+    }; 
+}
     
     function updateSummary() { 
         let t={calories:0,protein:0,fat:0,carbs:0,fiber:0,sodium:0,potassium:0,iron:0}; 

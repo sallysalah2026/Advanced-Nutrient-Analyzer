@@ -684,7 +684,7 @@
     }
 }
 
-   function updateCalculations() {
+function updateCalculations() {
     let h = parseFloat(document.getElementById('height').value);
     let w = parseFloat(document.getElementById('weight').value);
     let age = parseFloat(document.getElementById('age').value);
@@ -709,47 +709,64 @@
         weightNote = ` (بما أن BMI = ${bmi.toFixed(1)} > 30، نستخدم الوزن المعدل)`;
     }
     
-    // 3. تحديد القانون حسب الجنس
+    // 3. تحديد القانون حسب حالة المريض والجنس
     let bmrFormula = "";
     let bmr;
     let bmrSteps;
-    if(gender === 'male') {
-        bmrFormula = "BMR = (10 × الوزن) + (6.25 × الطول) - (5 × العمر) + 5";
-        bmr = (10*weightUsed) + (6.25*h) - (5*age) + 5;
-        bmrSteps = `BMR = (10 × ${weightUsed}) + (6.25 × ${h}) - (5 × ${age}) + 5 = ${bmr.toFixed(1)}`;
+    
+    if (patientType === 'inpatient') {
+        // Harris-Benedict
+        if (gender === 'male') {
+            bmrFormula = "BMR = 88.4 + (13.4 × الوزن) + (4.8 × الطول) - (5.7 × العمر)";
+            bmr = 88.4 + (13.4 * weightUsed) + (4.8 * h) - (5.7 * age);
+            bmrSteps = BMR = 88.4 + (13.4 × ${weightUsed}) + (4.8 × ${h}) - (5.7 × ${age}) = ${bmr.toFixed(1)};
+        } else {
+            bmrFormula = "BMR = 447.6 + (9.2 × الوزن) + (3.1 × الطول) - (4.3 × العمر)";
+            bmr = 447.6 + (9.2 * weightUsed) + (3.1 * h) - (4.3 * age);
+            bmrSteps = BMR = 447.6 + (9.2 × ${weightUsed}) + (3.1 × ${h}) - (4.3 × ${age}) = ${bmr.toFixed(1)};
+        }
     } else {
-        bmrFormula = "BMR = (10 × الوزن) + (6.25 × الطول) - (5 × العمر) - 161";
-        bmr = (10*weightUsed) + (6.25*h) - (5*age) - 161;
-        bmrSteps = `BMR = (10 × ${weightUsed}) + (6.25 × ${h}) - (5 × ${age}) - 161 = ${bmr.toFixed(1)}`;
+        // Mifflin-St Jeor (outpatient)
+        if (gender === 'male') {
+            bmrFormula = "BMR = (10 × الوزن) + (6.25 × الطول) - (5 × العمر) + 5";
+            bmr = (10 * weightUsed) + (6.25 * h) - (5 * age) + 5;
+            bmrSteps = BMR = (10 × ${weightUsed}) + (6.25 × ${h}) - (5 × ${age}) + 5 = ${bmr.toFixed(1)};
+        } else {
+            bmrFormula = "BMR = (10 × الوزن) + (6.25 × الطول) - (5 × العمر) - 161";
+            bmr = (10 * weightUsed) + (6.25 * h) - (5 * age) - 161;
+            bmrSteps = BMR = (10 × ${weightUsed}) + (6.25 × ${h}) - (5 × ${age}) - 161 = ${bmr.toFixed(1)};
+        }
     }
     
     // 4. قوانين العوامل
     let tefFormula = "TEF = BMR × 0.1 (تأثير الطعام الحراري)";
     let tef = bmr * 0.1;
-    let tefSteps = `TEF = ${bmr.toFixed(1)} × 0.1 = ${tef.toFixed(1)}`;
+    let tefSteps = TEF = ${bmr.toFixed(1)} × 0.1 = ${tef.toFixed(1)};
     
     let paValue = parseFloat(document.getElementById('paInput').value);
-    let paFormula = `PA = BMR × عامل النشاط (${paValue})`;
+    let paFormula = PA = BMR × عامل النشاط (${paValue});
     let pa = bmr * paValue;
-    let paSteps = `PA = ${bmr.toFixed(1)} × ${paValue} = ${pa.toFixed(1)}`;
+    let paSteps = PA = ${bmr.toFixed(1)} × ${paValue} = ${pa.toFixed(1)};
     
     let sfValue = parseFloat(document.getElementById('sfInput').value);
-    let sfFormula = `SF = BMR × عامل الإجهاد (${sfValue})`;
+    let sfFormula = SF = BMR × عامل الإجهاد (${sfValue});
     let sf = bmr * sfValue;
-    let sfSteps = `SF = ${bmr.toFixed(1)} × ${sfValue} = ${sf.toFixed(1)}`;
+    let sfSteps = SF = ${bmr.toFixed(1)} × ${sfValue} = ${sf.toFixed(1)};
     
     let pg = parseFloat(document.getElementById('pgInput').value);
     let pgFormula = "PG = عامل النمو (يضاف أو يطرح حسب الحالة)";
-    let pgSteps = `PG = ${pg > 0 ? '+' : ''}${pg}`;
+    let pgSteps = PG = ${pg > 0 ? '+' : ''}${pg};
     
     // 5. القانون النهائي لـ TEE
     let teeFormula = "TEE = BMR + TEF + PA + SF + PG";
     let tee = bmr + tef + pa + sf + pg;
     
     // 6. عرض النتائج مع القوانين والخطوات
+    let equationName = (patientType === 'inpatient') ? "📐 معادلة Harris-Benedict (داخلي)" : "📐 معادلة Mifflin-St Jeor (خارجي)";
+    
     document.getElementById('resultsArea').innerHTML = `
         <div class="result-item" style="grid-column: span 2; background: #f0f7f0; text-align: right;">
-            <div class="label" style="font-size: 14px; color: #2c5f2d;">📐 معادلة Mifflin-St Jeor</div>
+            <div class="label" style="font-size: 14px; color: #2c5f2d;">${equationName}</div>
             <div style="font-size: 12px; text-align: right; direction: ltr; font-family: monospace; line-height: 1.8;">
                 <strong style="color: #1e4a1f;">【 القانون الأساسي 】</strong><br>
                 ${bmrFormula}<br>
@@ -780,7 +797,7 @@
         <div class="result-item"><div class="label">BMI</div><div class="value">${bmi.toFixed(1)}</div><div>${bmiCat}</div></div>
         <div class="result-item"><div class="label">الوزن المثالي</div><div class="value">${ibw.toFixed(1)} كجم</div></div>
         <div class="result-item"><div class="label">الفرق في الوزن</div><div class="value">${diff>0?'+':''}${diff.toFixed(1)} كجم</div><div>${diff>0?'زيادة':'نقص'}</div></div>
-        ${abw?`<div class="result-item"><div class="label">الوزن المعدل</div><div class="value">${abw.toFixed(1)} كجم</div><div class="small-note">${weightNote}</div></div>`:''}
+        ${abw?<div class="result-item"><div class="label">الوزن المعدل</div><div class="value">${abw.toFixed(1)} كجم</div><div class="small-note">${weightNote}</div></div>:''}
         <div class="result-item"><div class="label">BMR (الاستقلاب الأساسي)</div><div class="value">${Math.round(bmr)}</div></div>
         <div class="result-item"><div class="label">TEF (تأثير الطعام)</div><div class="value">${Math.round(tef)}</div></div>
         <div class="result-item"><div class="label">PA (النشاط البدني)</div><div class="value">${Math.round(pa)}</div></div>
